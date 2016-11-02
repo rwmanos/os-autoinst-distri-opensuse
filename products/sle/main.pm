@@ -1009,6 +1009,45 @@ if (get_var("REGRESSION")) {
         load_x11regression_other();
     }
 }
+elsif (get_var('FLAVOR','') =~ /MyFlavor$/ ) {
+    if (defined(get_var("STORE_HDD_1")) || defined(get_var("PUBLISH_HDD_1"))) {
+        if (defined(get_var("ISO"))) {
+            load_boot_tests();
+            load_inst_tests();
+            load_reboot_tests();
+            loadtest "console/consoletest_setup"; # from load_consoletests();
+            #loadtest "qam/repose_setup";
+            #loadtest "qam/repose_install_sdk";
+            #loadtest "qam/repose_install_wsm";
+            #loadtest "qam/dup";
+            loadtest "console/hostname";
+            loadtest "update/updates_packagekit_gpk";
+        }
+        else {
+            #loadtest "qam/dup";
+            loadtest "boot/boot_to_desktop";
+            #loadtest "update/updates_packagekit_gpk";
+            loadtest "update/zypper_up";
+        }
+        #loadtest "boot/boot_to_desktop";
+        loadtest "shutdown/grub_set_bootargs";
+        loadtest "shutdown/shutdown";
+    }
+    else {
+        #load_boot_tests();
+        loadtest "boot/boot_to_desktop";
+        #loadtest "installation/grub_test";
+        #loadtest "installation/first_boot";
+
+        if (get_var('TEST_REPO')){
+            loadtest "qam/add_test_repo";
+        }
+
+        loadtest "console/consoletest_setup"; # from load_consoletests();
+        #loadtest "x11/ImageMagick";
+        loadtest "x11/wireshark";
+    }
+}
 elsif (get_var("FEATURE")) {
     prepare_target();
     load_feature_tests();
