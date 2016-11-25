@@ -21,6 +21,9 @@
 #   - save capture
 #   - load capture
 #   - examine again
+#  Layout test:
+#   - set false filter (empty capture list)
+#   - change layout and verify
 #  Profile test:
 #   - create new profile
 #   - change an option
@@ -42,7 +45,12 @@ sub run() {
     zypper_call "in wireshark";
 
     # start
-    type_string "wireshark\n";
+    if (check_var("VERSION", "Tumbleweed")) {
+        type_string "wireshark-gtk\n";
+    }
+    else {    # works for SLE12SP1 & SLE12SP2
+        type_string "wireshark\n";
+    }
     assert_screen "wireshark-welcome", 30;
     send_key "super-up";
     assert_screen "wireshark-fullscreen";
@@ -118,6 +126,27 @@ sub run() {
     type_string "dns.a\n";
     assert_screen "wireshark-filter-applied";
     assert_screen "wireshark-dns-response-list";
+
+    ###################
+    #   Layout test   #
+    ###################
+    # set a false filter (get IPv4 while NXDomain)
+    assert_and_click "wireshark-filter-clear";
+    assert_and_click "wireshark-filter-select";
+    type_string "dns.a and dns.flags == 0x8183\n";
+    assert_screen "wireshark-filter-applied";
+
+    # change layout
+    assert_screen "wireshark-layout-default";
+    assert_and_click "wireshark-edit";
+    assert_and_click "wireshark-edit-preferences";
+    assert_screen "wireshark-preferences";
+    assert_and_click "wireshark-preferences-layout";
+    assert_and_click "wireshark-preferences-layout-changepanes";
+    assert_and_click "wireshark-preferences-layout-pane3";
+    send_key "down";    # set pane3 to none
+    send_key "ret";
+    assert_screen "wireshark-layout-no-pane3";
 
     # close capture
     assert_and_click "wireshark-close-capture";
