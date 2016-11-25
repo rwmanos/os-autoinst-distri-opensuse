@@ -566,6 +566,10 @@ sub load_extra_tests() {
     }
     elsif (any_desktop_is_applicable() && get_var("EXTRATEST")) {
         if (!get_var("NOAUTOLOGIN")) {
+            if (check_var("DESKTOP", "gnome")) {
+                loadtest "x11/wireshark";
+                loadtest "x11/ImageMagick";
+            }
             loadtest "x11/multi_users_dm";
         }
         if (gnomestep_is_applicable() && check_var('VERSION', '42.2')) {

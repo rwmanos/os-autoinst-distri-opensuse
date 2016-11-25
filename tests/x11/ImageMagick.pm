@@ -99,7 +99,10 @@ sub run() {
     assert_screen "imagemagick_color_extent";
     send_key "alt-f4";
 
-    assert_screen "imagemagick_color_border";
+    assert_screen [qw(imagemagick_color_border imagemagick_test)];
+    if (match_has_tag "imagemagick_test") {
+        record_soft_failure "bsc#1003086";
+    }
     send_key "alt-f4";
 
     assert_screen "imagemagick_color_fx_constant";
