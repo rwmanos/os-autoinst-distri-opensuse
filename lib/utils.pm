@@ -35,6 +35,7 @@ our @EXPORT = qw/
   setup_online_migration
   turn_off_kde_screensaver
   random_string
+  test_shell
   /;
 
 
@@ -764,6 +765,24 @@ sub random_string {
     $length //= 4;
     my @chars = ('A' .. 'Z', 'a' .. 'z', 0 .. 9);
     return join '', map { @chars[rand @chars] } 1 .. $length;
+}
+
+sub test_shell {
+    my ($attempt) = 0;
+    my ($limit) = 3;
+    if (@_ == 1) {
+        my ($limit) = @_;
+    }
+    while ($attempt <= $limit) {
+        type_string "echo ready > /dev/$testapi::serialdev\n";
+        wait_serial ("ready", 5, 1);
+        my ($is_ready) = script_output "echo ready";
+        if ($is_ready ~= "ready") {
+            return;
+        }
+        $attempt++;
+    }
+    die "No shell"
 }
 
 1;
